@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 
-import { postAdded } from "./postSlice";
+import { addNewPosts } from "./postSlice";
 import { selectAllUsers } from "../users/userSlice";
 
 const initialPostData = {
 	title: "",
-	content: "",
+	body: "",
 	userId: 0,
 };
 
@@ -14,8 +14,13 @@ export default function AddPostForm() {
 	const dispatch = useDispatch();
 
 	const [postData, setPostData] = useState(initialPostData);
+	const [addRequestStateus, setAddRequestStateus] = useState("idle");
 
 	const users = useSelector(selectAllUsers);
+
+	const canSave =
+		[postData.title, postData.body, postData.userId].every(Boolean) &&
+		addRequestStateus === "idle";
 
 	const handleChange = (e) => {
 		setPostData({
@@ -27,16 +32,18 @@ export default function AddPostForm() {
 	const handleCreatePost = (e) => {
 		e.preventDefault();
 
-		if (postData.title && postData.content) {
-			dispatch(postAdded(postData));
-			setPostData(initialPostData);
+		if (canSave) {
+			try {
+				setAddRequestStateus("pending");
+				dispatch(addNewPosts(postData));
+				setPostData(initialPostData);
+			} catch (error) {
+				console.log("Faild to save the post", error);
+			} finally {
+				setAddRequestStateus("idle");
+			}
 		}
 	};
-
-	const canSave =
-		Boolean(postData.title) &&
-		Boolean(postData.userId) &&
-		Boolean(postData.content);
 
 	return (
 		<div>
@@ -68,13 +75,13 @@ export default function AddPostForm() {
 				</select>
 				<br />
 
-				<label htmlFor="content">Content</label>
+				<label htmlFor="body">Body</label>
 				<textarea
-					name="content"
-					id="content"
+					name="body"
+					id="body"
 					cols="30"
 					rows="5"
-					value={postData.content}
+					value={postData.body}
 					onChange={handleChange}
 				></textarea>
 				<br />

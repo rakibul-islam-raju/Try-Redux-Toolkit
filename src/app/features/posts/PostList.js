@@ -1,23 +1,41 @@
-import { useSelector } from "react-redux";
-import PostAuthor from "./PostAuthor";
-import { selectAllPosts } from "./postSlice";
-import ReactionButtons from "./ReactionButtons";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import PostExcerpt from "./PostExcerpt";
+
+import {
+	selectAllPosts,
+	getPostStatus,
+	getPostError,
+	fetchPosts,
+} from "./postSlice";
 
 export default function PostList() {
+	const dispatch = useDispatch();
+
 	const posts = useSelector(selectAllPosts);
+	const postsStatus = useSelector(getPostStatus);
+	const postsError = useSelector(getPostError);
+
+	useEffect(() => {
+		if (postsStatus === "idle") {
+			dispatch(fetchPosts());
+		}
+	}, [postsStatus, dispatch]);
 
 	return (
 		<div>
-			<h4>All Posts -</h4>
-			{posts?.map((post) => (
-				<article key={post.id}>
-					<h5>{post.title}</h5>
-					<p>{post.content.substring(0, 100)}</p>
-					<PostAuthor userId={post.userId} />
-					<ReactionButtons post={post} />
-					<hr />
-				</article>
-			))}
+			<h3>All Posts -</h3>
+
+			{postsStatus === "loading" ? (
+				<h5>Loading...</h5>
+			) : postsStatus === "succeeded" ? (
+				posts
+					?.slice(0)
+					.reverse()
+					.map((post) => <PostExcerpt post={post} />)
+			) : (
+				postsStatus === "failed" && <h6>{postsError}</h6>
+			)}
 		</div>
 	);
 }
