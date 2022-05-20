@@ -5,7 +5,7 @@ export default function App() {
 	return (
 		<div className="App">
 			<AddPostForm />
-
+			<br />
 			<PostList />
 		</div>
 	);

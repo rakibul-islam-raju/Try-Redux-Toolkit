@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import PostExcerpt from "./PostExcerpt";
 
@@ -6,7 +5,8 @@ import {
 	selectAllPosts,
 	getPostStatus,
 	getPostError,
-	fetchPosts,
+	counterAdded,
+	getCounter,
 } from "./postSlice";
 
 export default function PostList() {
@@ -15,15 +15,16 @@ export default function PostList() {
 	const posts = useSelector(selectAllPosts);
 	const postsStatus = useSelector(getPostStatus);
 	const postsError = useSelector(getPostError);
-
-	useEffect(() => {
-		if (postsStatus === "idle") {
-			dispatch(fetchPosts());
-		}
-	}, [postsStatus, dispatch]);
+	const counter = useSelector(getCounter);
 
 	return (
 		<div>
+			<button type="button" onClick={() => dispatch(counterAdded())}>
+				{counter}
+			</button>
+
+			<br />
+
 			<h3>All Posts -</h3>
 
 			{postsStatus === "loading" ? (

@@ -6,7 +6,5 @@ export default function PostAuthor({ userId }) {
 
 	const author = users.find((user) => user.id === Number(userId));
 
-	console.log("author", author);
-
 	return <span>by {author ? author.name : "unknown author"}</span>;
 }
